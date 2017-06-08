@@ -1,13 +1,15 @@
 package com.github.abrasha.dounotifier.service;
 
 import com.github.abrasha.dounotifier.core.Event;
+import lombok.SneakyThrows;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +21,7 @@ import static java.lang.String.format;
 @Service
 public class DouCalendarImpl implements DouCalendar {
     
-    private static final String NEWS_BLOCK = "col50 m-cola";
+    private static final String NEWS_BLOCK = "col50";
     private static final String NEWS_ENTRY = ".b-postcard";
     
     private final DocumentFetcher documentFetcher;
@@ -45,29 +47,31 @@ public class DouCalendarImpl implements DouCalendar {
         Set<Event> result = new HashSet<>();
         
         try {
-            for (int i = 0; i < 20; i++) {
+            result.addAll(parseEventsFromPage(city, 0));
+            for (int i = 2; i < 20; i++) {
                 result.addAll(parseEventsFromPage(city, i));
             }
         } catch (Exception e) {
-            System.out.println("Done reading news");
+            System.out.println("Done reading news with exception: " + e);
         }
         
         return result;
     }
     
     
+    @SneakyThrows
     private Set<Event> parseEventsFromPage(String city, int page) {
         
         
-        Document document = documentFetcher.fetchDocument(generatePageUrl(city, page));
+        String url = generatePageUrl(city, page);
+        Document document = documentFetcher.fetchDocument(new URL(url));
         
-        Elements select = document.getElementsByClass(NEWS_BLOCK);
+        Element news = document.getElementsByClass(NEWS_BLOCK).first();
         
         Set<Event> result = new HashSet<>(20);
         
         
-        for (Element element : select.select(NEWS_ENTRY)) {
-            System.out.println(element.html());
+        for (Element element : news.select(NEWS_ENTRY)) {
             
             Event event = new Event();
             
@@ -86,7 +90,7 @@ public class DouCalendarImpl implements DouCalendar {
 //            Element price = element.select(".when-and-where>span").get(1);
 //            event.setPrice(price.text());
             
-            Element content =   element.select(".b-typo").get(0);
+            Element content = element.select(".b-typo").get(0);
             event.setContent(content.text());
             
             event.setTags(new HashSet<>());
@@ -102,12 +106,15 @@ public class DouCalendarImpl implements DouCalendar {
         return result;
     }
     
+    @SneakyThrows
     private String generatePageUrl(String city, int page) {
+        
+        city = URLEncoder.encode(city, "UTF-8");
         
         if (page == 0) {
             return format("%s/city/%s/", douCalendarRoot, city);
         } else {
-            return format("%s/city/%s/%d", douCalendarRoot, city, page);
+            return format("%s/city/%s/%d/", douCalendarRoot, city, page);
         }
         
     }

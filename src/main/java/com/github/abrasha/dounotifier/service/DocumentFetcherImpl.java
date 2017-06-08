@@ -5,6 +5,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
+
 /**
  * @author Andrii Abramov on 6/8/17.
  */
@@ -13,7 +15,7 @@ public class DocumentFetcherImpl implements DocumentFetcher {
     
     @Override
     @SneakyThrows
-    public Document fetchDocument(String url) {
-        return Jsoup.connect(url).get();
+    public Document fetchDocument(URL url) {
+        return Jsoup.parse(url, 10_000);
     }
 }
