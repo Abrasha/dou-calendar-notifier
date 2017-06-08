@@ -25,4 +25,9 @@ public class DouCalendarController {
         return douCalendar.getEvents(city, page);
     }
     
+    @GetMapping("/events/{city}/all")
+    public Set<Event> getAllEvents(@PathVariable("city") String city) {
+        return douCalendar.getAllEvents(city);
+    }
+    
 }
