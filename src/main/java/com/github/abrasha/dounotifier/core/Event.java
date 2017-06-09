@@ -1,6 +1,8 @@
 package com.github.abrasha.dounotifier.core;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -11,10 +13,10 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Event {
-    
+
     String title;
     String content;
     String whenAndWhere;
     Set<String> tags;
-    
+
 }

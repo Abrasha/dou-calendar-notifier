@@ -9,9 +9,9 @@ import java.util.Set;
  * @author Andrii Abramov on 6/9/17.
  */
 public interface DouCalendarNotifier {
-    
+
     void refreshNews();
-    
+
     void sendNotifications(Set<Event> events, List<String> recipients);
-    
+
 }
